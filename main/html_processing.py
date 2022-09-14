@@ -14,7 +14,7 @@ processed_data = {}
 class parser_html:
     def __init__(self, data, name_product):
         self.data = data
-        self.name_product = name_product
+        self.name_product = name_product.replace('.html', '')
         self.pr_data = dict()
 
     def parser_mvm(self):
@@ -63,7 +63,8 @@ class ConversionTemplate():
             if i == '1':
                 main_camera = obj[y].split('/')
                 count = len(main_camera)
-                main_camera = max(map(int, main_camera))
+
+                main_camera = max(map(lambda x: int(x) if x.isnumeric() else 0, main_camera))
                 camera_module = obj[y]
 
                 if count > 1:
@@ -89,11 +90,11 @@ class ConversionTemplate():
                     else:
                         _i2[item[1]] = _i2[item[0]]
                         _i2.pop(item[0])
-                        pass
 
-        # Удаление из списка полей которых не т в шаблоне
+        """Удаление из списка полей которых не т в шаблоне"""
         _d = defaultdict(list)
         for product, list_value in self.processed_data.items():
+
             for title_value, item_value in list_value.items():
                 try:
                     self.all_data_csv.index(title_value)
@@ -119,8 +120,8 @@ def startHtmlProcessing():
         conversion.m_search_for_changes()
         conversion.replacement_in_masive()
 
-        print(obj_spec_product.pr_data)
-        processed_data.append(obj_spec_product.pr_data)
+        processed_data.append(conversion.processed_data)
+    return processed_data
 
 
-startHtmlProcessing()
+# startHtmlProcessing()

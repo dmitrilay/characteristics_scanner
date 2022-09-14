@@ -1,3 +1,9 @@
+# data/
+_d/
+html_page/
+archive/
+
+# 
 верстка/
 .env/
 /staticfiles
@@ -7,7 +13,7 @@
 /shop/migrations
 /orders/migrations
 /django_cache
-/data
+
 
 # общие
 *.ba
