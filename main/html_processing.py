@@ -1,7 +1,9 @@
 from ast import Lambda
+from calendar import c
 from collections import defaultdict
 from multiprocessing.sharedctypes import Value
 from re import X
+import re
 from tkinter.messagebox import NO
 from turtle import title
 from bs4 import BeautifulSoup
@@ -35,74 +37,73 @@ class parser_html:
 
 class ConversionTemplate():
     def __init__(self, f_csv, processed_data):
-        self.f_csv = f_csv
+        self.f_csv = [x[0].split(';') for x in f_csv]
         self.processed_data = processed_data
         self.search_for_changes = None
         self.all_data_csv = None
 
-    def m_search_for_changes(self):
-        """Удаляем данные в которых не нужно ничего менять"""
-        def is_adalt(obj):
-            el1, el2 = obj[0].split(';')
-            return [el1, el2] if el1 != el2 and el2 != '' else 0
-
-        _f = list(filter(lambda x: x != 0, (map(is_adalt, self.f_csv))))
-        self.search_for_changes = _f
-
-        def is_adalt(obj):
-            el1, el2 = obj[0].split(';')
-            return el1
-
-        _f = list(filter(lambda x: x != 0, (map(is_adalt, self.f_csv))))
-        self.all_data_csv = _f
+    def deleting_outside_template(self):
+        """Удаление из списка полей которых нет в шаблоне csv"""
+        pattern_from_csv = [x[0] for x in self.f_csv]
+        _d = defaultdict(list)
+        for product, list_value in self.processed_data.items():
+            for title_value, item_value in list_value.items():
+                if title_value in pattern_from_csv:
+                    _d[product].append([title_value, item_value])
+        self.processed_data = _d
 
     def replacement_in_masive(self):
 
-        def special_logic(x, y, obj):
-            i = x[3:4]
-            if i == '1':
-                main_camera = obj[y].split('/')
-                count = len(main_camera)
+        _t, *_ = [*self.processed_data.values()]
+        basic_data = {x[0]: x[1] for x in _t}
 
-                main_camera = max(map(lambda x: int(x) if x.isnumeric() else 0, main_camera))
-                camera_module = obj[y]
+        basic_csv = {x[0]: [x[1], x[2]] for x in self.f_csv}
 
-                if count > 1:
-                    obj['Основная камера МПикс'] = main_camera
-                    obj['Модуль камер'] = camera_module
+        new_basic_data = {}
 
-            elif i == '2':
-                key_1, key_2 = 'Диагональ', 'Разрешение экрана'
-                argument_1, argument_2 = obj[y].split('/')
-                obj[key_1] = argument_1
-                obj[key_2] = argument_2
-                obj.pop(y)
+        for title_spec, value_spec in basic_data.items():
+            if title_spec in basic_csv.keys():
+                csv_value_spec, csv_type_spec = basic_csv[title_spec]
 
-            elif i == '3':
-                arg = obj[y].split(' ')
-                obj[y] = arg[1]
+                if csv_value_spec[0:3] == '>=>':
+                    _r = self.special_logic(csv_value_spec, title_spec, value_spec)
+                    new_basic_data.update(_r)
+                elif csv_type_spec == 'int':
+                    _value_spec = self._clearing_letters(value_spec)
+                    new_basic_data[csv_value_spec] = _value_spec
+                else:
+                    new_basic_data[csv_value_spec] = value_spec
 
-        for item in self.search_for_changes:
-            for _i2 in self.processed_data.values():
-                if _i2.get(item[0]):
-                    if item[1][0:3] == '>=>':
-                        special_logic(item[1], item[0], _i2)
-                    else:
-                        _i2[item[1]] = _i2[item[0]]
-                        _i2.pop(item[0])
+        new_basic_data = [[x, y] for x, y in new_basic_data.items()]
+        _key = [*self.processed_data.keys()]
+        self.processed_data[_key[0]] = new_basic_data
 
-        """Удаление из списка полей которых не т в шаблоне"""
-        _d = defaultdict(list)
-        for product, list_value in self.processed_data.items():
+    @staticmethod
+    def _clearing_letters(_str):
+        pattern = r'[\d\.]{1,10}'
+        result = re.search(pattern, _str)
+        return result.group(0)
 
-            for title_value, item_value in list_value.items():
-                try:
-                    self.all_data_csv.index(title_value)
-                    _d[product].append([title_value, item_value])
-                except ValueError:
-                    pass
+    @staticmethod
+    def special_logic(x, y, value):
+        _r = {}
+        i = x[3:4]
 
-        self.processed_data = _d
+        if i == '1':
+            """Ищум самую большую камеру по мега пикселям"""
+            main_camera = max([int(x) if x.isnumeric() else 0 for x in value.split('/')])
+            camera_module = value
+
+            if str(main_camera) != camera_module:
+                _r['Основная камера МПикс'] = main_camera
+                _r['Модуль камер'] = camera_module
+        elif i == '2':
+            argument_1, argument_2 = value.split('/')
+            _r['Диагональ'], _r['Разрешение экрана'] = argument_1, argument_2
+        elif i == '3':
+            _r['Бренд'] = value.split(' ')[1]
+
+        return _r
 
 
 def startHtmlProcessing():
@@ -117,11 +118,11 @@ def startHtmlProcessing():
 
         f_csv = WorkFolderFiles.open_file_csv('cat/smartfony.csv')
         conversion = ConversionTemplate(f_csv, obj_spec_product.pr_data)
-        conversion.m_search_for_changes()
+        conversion.deleting_outside_template()
         conversion.replacement_in_masive()
-
         processed_data.append(conversion.processed_data)
     return processed_data
 
 
+# startHtmlProcessing()
 # startHtmlProcessing()
