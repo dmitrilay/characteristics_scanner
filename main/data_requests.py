@@ -1,13 +1,7 @@
 import json
 import requests
 from requests.auth import AuthBase
-
-
-def sending_data():
-    url = 'http://127.0.0.1:8000/spec/add-characteristic-ajax/'
-    _r = requests.get(url)
-    _d = json.loads(_r.text)
-    return (_d)
+from settings import *
 
 
 class TokenAuth(AuthBase):
@@ -19,14 +13,22 @@ class TokenAuth(AuthBase):
         return r
 
 
-token = "fjwoapfjow@204diojwa!24dkapwojfjjf22401jdwa190jd(odwa"
+def sending_spec(obj=0):
+    if obj:
+        pathname = PATH_NAME
+        host = HOST
+        url = f'{host}{pathname}'
+
+        _json = json.dumps(obj)
+        _r = requests.post(url, auth=TokenAuth(token), data={'data': _json})
+
+        print('Данные отправлены!')
+    else:
+        print('Нет данных для отправки!')
 
 
-def sending_spec(obj):
-    _json = json.dumps(obj)
-    url = 'http://127.0.0.1:8000/spec/add-characteristic-ajax/'
-    _r = requests.post(url, auth=TokenAuth(token), data={'data': _json})
-
-
-# sending_data()
-# sending_spec()
+def sending_get_data():
+    url = f'{HOST}{PATH_NAME}'
+    _r = requests.get(url)
+    result = json.loads(_r.text)
+    return result

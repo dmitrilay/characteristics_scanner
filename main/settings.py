@@ -1,11 +1,7 @@
-import os
-import datetime
+DEBUG = True
 
-URLs = [
-    "https://online.smartlombard.ru/login/",
-    # "https://www.dns-shop.ru/catalog/17a8ae4916404e77/televizory/",
-]
 
+"""Настройки браузера"""
 options_web = {
     'profile.managed_default_content_settings.javascript': 2,
     'profile.managed_default_content_settings.images': 2,
@@ -14,14 +10,32 @@ options_web = {
     'profile.managed_default_content_settings.stylesheets': 2
 }
 
-# file_path = "C:/Users/dmitr/OneDrive/Документы/1_Parser/mts.xlsx"
-# name_f = os.path.normpath(f'{head}/data/{name_f}.xlsx')
 
-# Каталог и путь до него
-name_f = 'eldorado.xlsx'
-head, tail = os.path.split(__file__)
-current_time = datetime.datetime.now().strftime("%d-%m-%y_%H-%M") + '_'
-parent = os.path.dirname(head)
+"""Файловая система"""
+FOLDERS = [
+    'archive/html_page',
+    'cat',
+    'html_page',
+    'json',
+]
 
-current_folder = os.path.normpath(os.path.normpath(f'{head}/data/{current_time}_{name_f}'))
-external_folder = os.path.normpath(f"{parent}/{'parser_data'}/{name_f}")
+
+try:
+    if DEBUG:
+        from settings_local import *
+    else:
+        from settings_dev import *
+except:
+    print('settings_dev', 'settings_local', "файлы не найдены")
+
+    """Авторизация"""
+    url = 'https://online.smartlombard.ru/login/'
+    username = ""
+    password = ""
+
+    """Авторизация на ch-shop.ru"""
+    token = "111111111"
+
+    """Данные для сайта"""
+    PATH_NAME = 'smartlombard/v2/v2/v3'
+    HOST = 'http://127.0.0.1:8000/'

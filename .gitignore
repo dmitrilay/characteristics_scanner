@@ -1,4 +1,6 @@
 # data/
+settings_dev.py
+settings_local.py
 _d/
 html_page/
 archive/
