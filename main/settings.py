@@ -39,3 +39,10 @@ except:
     """Данные для сайта"""
     PATH_NAME = 'smartlombard/v2/v2/v3'
     HOST = 'http://127.0.0.1:8000/'
+
+
+"""Категории"""
+CATEGORY_CSV = {
+    'portativnye-kolonki': 'Портативные-колонки',
+    'smartfony': 'Смартфоны',
+}

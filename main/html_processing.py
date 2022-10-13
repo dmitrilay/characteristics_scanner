@@ -4,11 +4,11 @@ from collections import defaultdict
 from multiprocessing.sharedctypes import Value
 from re import X
 import re
-from tkinter.messagebox import NO
 from turtle import title
 from bs4 import BeautifulSoup
 from files_and_folders import *
 import csv
+from settings import CATEGORY_CSV
 
 processed_data = {}
 
@@ -106,17 +106,18 @@ class ConversionTemplate():
         return _r
 
 
-def startHtmlProcessing():
+def startHtmlProcessing(obj):
     processed_data = list()
     obj_file = WorkFolderFiles()
     obj_file.find_file()
-    data = obj_file.list_file
-    for key, value in data.items():
-        obj_file.open_file(value[0])
-        obj_spec_product = parser_html(obj_file.data, key)
+    for name_product, value in obj.items():
+        name_product_file, _ = obj_file.list_file[f'{name_product}.html']
+        category = CATEGORY_CSV[value['category']]
+        obj_file.open_file(name_product_file)
+        obj_spec_product = parser_html(obj_file.data, name_product)
         obj_spec_product.parser_mvm()
 
-        f_csv = WorkFolderFiles.open_file_csv('cat/smartfony.csv')
+        f_csv = WorkFolderFiles.open_file_csv(f'cat/{category}.csv')
         conversion = ConversionTemplate(f_csv, obj_spec_product.pr_data)
         conversion.deleting_outside_template()
         conversion.replacement_in_masive()
