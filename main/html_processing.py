@@ -4,11 +4,11 @@ from collections import defaultdict
 from multiprocessing.sharedctypes import Value
 from re import X
 import re
-from tkinter.messagebox import NO
 from turtle import title
 from bs4 import BeautifulSoup
 from files_and_folders import *
 import csv
+from settings import CATEGORY_CSV
 
 processed_data = {}
 
@@ -25,9 +25,13 @@ class parser_html:
         characteristics = soup.find_all('div', attrs={'class': 'characteristics'})
         spec_and_value = characteristics[0].find_all(attrs={'class': 'item-with-dots'})
         for i in spec_and_value:
-            spec = i.find(attrs={'class': 'item-with-dots__title'})
-            value = i.find(attrs={'class': 'item-with-dots__value'})
-            product_spec_dict[spec.text.strip()] = value.text.strip()
+            spec = i.find(attrs={'class': 'item-with-dots__title'}).text.strip()
+            value = i.find(attrs={'class': 'item-with-dots__value'}).text.strip()
+
+            if product_spec_dict.get(spec):
+                product_spec_dict[spec] = f'{product_spec_dict[spec]} {value}'
+            else:
+                product_spec_dict[spec] = value
 
         title = soup.find(attrs={'class': 'bar__product-title'}).text.strip()
         product_spec_dict['Бренд'] = title
@@ -98,25 +102,27 @@ class ConversionTemplate():
                 _r['Основная камера МПикс'] = main_camera
                 _r['Модуль камер'] = camera_module
         elif i == '2':
-            argument_1, argument_2 = value.split('/')
-            _r['Диагональ'], _r['Разрешение экрана'] = argument_1, argument_2
+            arg_1, arg_2 = re.search(r'\d{1,2}\.\d{1,2}"', value), re.search(r'\d{2,4}x\d{2,4}', value)
+            _r['Диагональ'] = arg_1[0] if arg_1 else arg_1
+            _r['Разрешение экрана'] = arg_2[0] + ' Пикс' if arg_2 else arg_2
         elif i == '3':
             _r['Бренд'] = value.split(' ')[1]
 
         return _r
 
 
-def startHtmlProcessing():
+def startHtmlProcessing(obj):
     processed_data = list()
     obj_file = WorkFolderFiles()
     obj_file.find_file()
-    data = obj_file.list_file
-    for key, value in data.items():
-        obj_file.open_file(value[0])
-        obj_spec_product = parser_html(obj_file.data, key)
+    for name_product, value in obj.items():
+        name_product_file, _ = obj_file.list_file[f'{name_product}.html']
+        category = CATEGORY_CSV[value['category']]
+        obj_file.open_file(name_product_file)
+        obj_spec_product = parser_html(obj_file.data, name_product)
         obj_spec_product.parser_mvm()
 
-        f_csv = WorkFolderFiles.open_file_csv('cat/smartfony.csv')
+        f_csv = WorkFolderFiles.open_file_csv(f'cat/{category}.csv')
         conversion = ConversionTemplate(f_csv, obj_spec_product.pr_data)
         conversion.deleting_outside_template()
         conversion.replacement_in_masive()
