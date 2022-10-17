@@ -1,13 +1,7 @@
-from ast import Lambda
-from calendar import c
 from collections import defaultdict
-from multiprocessing.sharedctypes import Value
-from re import X
 import re
-from turtle import title
 from bs4 import BeautifulSoup
 from files_and_folders import *
-import csv
 from settings import CATEGORY_CSV
 
 processed_data = {}
@@ -33,9 +27,8 @@ class parser_html:
             else:
                 product_spec_dict[spec] = value
 
-        title = soup.find(attrs={'class': 'bar__product-title'}).text.strip()
-        product_spec_dict['Бренд'] = title
-
+        title = soup.find_all(attrs={'class': 'breadcrumbs__link'})
+        product_spec_dict['Бренд'] = title[-1].text.strip() if title else 'NoBrand'
         self.pr_data[self.name_product] = product_spec_dict
 
 
@@ -105,8 +98,6 @@ class ConversionTemplate():
             arg_1, arg_2 = re.search(r'\d{1,2}\.\d{1,2}"', value), re.search(r'\d{2,4}x\d{2,4}', value)
             _r['Диагональ'] = arg_1[0] if arg_1 else arg_1
             _r['Разрешение экрана'] = arg_2[0] + ' Пикс' if arg_2 else arg_2
-        elif i == '3':
-            _r['Бренд'] = value.split(' ')[1]
 
         return _r
 
@@ -128,7 +119,3 @@ def startHtmlProcessing(obj):
         conversion.replacement_in_masive()
         processed_data.append(conversion.processed_data)
     return processed_data
-
-
-# startHtmlProcessing()
-# startHtmlProcessing()
