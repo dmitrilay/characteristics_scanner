@@ -43,6 +43,6 @@ except:
 
 """Категории"""
 CATEGORY_CSV = {
-    'portativnye-kolonki': 'Портативные-колонки',
+    'portativnyie-kolonki': 'Портативные-колонки',
     'smartfony': 'Смартфоны',
 }

@@ -5,7 +5,6 @@ from files_and_folders import WorkFolderFiles
 
 data = sending_get_data()
 startParserSpecMVM(data)
-data = startHtmlProcessing()
+data = startHtmlProcessing(data)
 sending_spec(data)
-
 WorkFolderFiles.file_cleaner()
