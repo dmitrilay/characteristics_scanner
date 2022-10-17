@@ -1,1 +1,1 @@
-D:\parser_smartlombard\env\Scripts\python.exe D:\parser_smartlombard\main\main.py %*
+D:\characteristics_scanner\env\Scripts\python.exe D:\characteristics_scanner\main\demon.py %*

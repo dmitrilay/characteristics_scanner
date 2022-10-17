@@ -9,4 +9,4 @@ while True:
     _th = threading.Thread(target=auto, args=(), name='thr-1')
     _th.start()
     _th.join()
-    time.sleep(3600)
+    time.sleep(120)
