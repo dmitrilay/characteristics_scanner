@@ -32,4 +32,5 @@ CATEGORY_CSV = {
     'smartfony': 'Смартфоны',
     'portativnaya-akustika': 'Портативные-колонки',
     'mobilnyie-telefonyi': 'Мобильные-телефоны',
+    'fitnes-brasletyi-i-chasyi': 'Фитнес-браслеты'
 }
