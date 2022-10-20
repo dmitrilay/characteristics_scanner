@@ -31,4 +31,5 @@ CATEGORY_CSV = {
     'portativnyie-kolonki': 'Портативные-колонки',
     'smartfony': 'Смартфоны',
     'portativnaya-akustika': 'Портативные-колонки',
+    'mobilnyie-telefonyi': 'Мобильные-телефоны',
 }
