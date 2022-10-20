@@ -38,6 +38,7 @@ class ConversionTemplate():
         self.processed_data = processed_data
         self.search_for_changes = None
         self.all_data_csv = None
+        self.drive_dict = {}
 
     def deleting_outside_template(self):
         """Удаление из списка полей которых нет в шаблоне csv"""
@@ -81,8 +82,7 @@ class ConversionTemplate():
         result = re.search(pattern, _str)
         return result.group(0)
 
-    @staticmethod
-    def special_logic(x, y, value):
+    def special_logic(self, x, y, value):
         _r = {}
         i = x[3:4]
 
@@ -96,8 +96,37 @@ class ConversionTemplate():
                 _r['Модуль камер'] = camera_module
         elif i == '2':
             arg_1, arg_2 = re.search(r'\d{1,2}\.\d{1,2}"', value), re.search(r'\d{2,4}x\d{2,4}', value)
-            _r['Диагональ'] = arg_1[0] if arg_1 else arg_1
-            _r['Разрешение экрана'] = arg_2[0] + ' Пикс' if arg_2 else arg_2
+            if arg_1:
+                _r['Диагональ'] = arg_1[0] if arg_1 else arg_1
+            if arg_2:
+                _r['Разрешение экрана'] = arg_2[0] + ' Пикс' if arg_2 else arg_2
+        elif i == '3':
+            spec1, spec2, newcpec, template = x[5::].split('>')
+            _id = [spec1, spec2].index(y)
+            value = re.search(r'\d{1,4}', value)[0]
+            if self.drive_dict.get(newcpec) == None:
+                self.drive_dict[newcpec] = [0]*2
+            self.drive_dict[newcpec][_id] = value
+
+            if self.drive_dict[newcpec][0] != 0 and self.drive_dict[newcpec][1] != 0:
+                template = template[1:-1]
+                template = template.format(*self.drive_dict[newcpec])
+                _r[newcpec] = template
+                return _r
+        elif i == '4':
+            spec1, spec2, spec3, newcpec, template = x[5::].split('>')
+            _id = [spec1, spec2, spec3].index(y)
+            value = re.search(r'\d{1,4}', value)[0]
+            if self.drive_dict.get(newcpec) == None:
+                self.drive_dict[newcpec] = [0]*3
+            self.drive_dict[newcpec][_id] = value
+
+            _dd = self.drive_dict[newcpec]
+            if _dd[0] != 0 and _dd[1] != 0 and _dd[2] != 0:
+                template = template[1:-1]
+                template = template.format(*_dd)
+                _r[newcpec] = template
+                return _r
 
         return _r
 
@@ -112,8 +141,12 @@ def startHtmlProcessing(obj):
         obj_file.open_file(name_product_file)
         obj_spec_product = parser_html(obj_file.data, name_product)
         obj_spec_product.parser_mvm()
-
         f_csv = WorkFolderFiles.open_file_csv(f'cat/{category}.csv')
+
+        # Костыль, в случае если бренд не забит в категории
+        if f_csv.count('Бренд') == 0:
+            f_csv.append(['Бренд;Бренд;str'])
+
         conversion = ConversionTemplate(f_csv, obj_spec_product.pr_data)
         conversion.deleting_outside_template()
         conversion.replacement_in_masive()
