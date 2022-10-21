@@ -34,4 +34,5 @@ CATEGORY_CSV = {
     'mobilnyie-telefonyi': 'Мобильные-телефоны',
     'fitnes-brasletyi-i-chasyi': 'Фитнес-браслеты',
     'naushniki': 'Наушники',
+    'byitovaya-tehnika': 'Бытовая-техника',
 }
