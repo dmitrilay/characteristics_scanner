@@ -56,9 +56,7 @@ class WorkFolderFiles():
         file_folder = os.path.normpath(f'{head}/data/{file_folder}')
         with open(file_folder, 'r', encoding='utf-8') as file:
             file_reader = csv.reader(file, delimiter=",")
-            return (list(file_reader))
-
-
-# file = WorkFolderFiles()
-# file.find_file()
-# print(file.list_file)
+            # Удаление непонятного символа "\ufeff"
+            _r = list(file_reader)
+            _r[0][0] = _r[0][0].replace('\ufeff', '')
+            return _r
