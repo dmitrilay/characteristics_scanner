@@ -35,4 +35,5 @@ CATEGORY_CSV = {
     'fitnes-brasletyi-i-chasyi': 'Фитнес-браслеты',
     'naushniki': 'Наушники',
     'byitovaya-tehnika': 'Бытовая-техника',
+    'usb-fleshki-i-kartyi-pamyati': 'USB-накопители-и-карты-памяти',
 }
