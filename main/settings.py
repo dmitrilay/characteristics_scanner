@@ -39,5 +39,8 @@ CATEGORY_CSV = {
     'planshetyi': 'Планшеты',
     'tovaryi-dlya-avtomobilya': 'Видеорегистраторы',
     'noutbuki-i-kompyuteryi': 'Ноутбуки',
+    'televizoryi': 'Телевизоры',
+    'myishki-klaviaturyi-i-drugie-aks': 'Мышки-клавиатуры'
+
 
 }
